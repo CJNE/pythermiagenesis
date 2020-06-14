@@ -10,13 +10,13 @@ setup(
     description="Python wrapper for getting data from Thermia Mega and Inverter heat pumps \
         via Modbus TCP.",
     include_package_data=True,
-    url="https://github.com/cjne/thermiagenesis",
-    license="Apache 2",
+    url="https://github.com/cjne/pythermiagenesis",
+    license="MIT",
     packages=["pythermiagenesis"],
     python_requires=">=3.6",
-    install_requires=["pymodbus", "pymodbustcp"],
+    install_requires=["pymodbustcp"],
     classifiers=[
-        "License :: OSI Approved :: Apache Software License",
+        "License :: MIT License",
         "Programming Language :: Python",
         "Operating System :: OS Independent",
     ],

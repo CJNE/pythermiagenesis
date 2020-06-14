@@ -20,8 +20,12 @@ async def main():
     #                mega     - for Mega
     thermia = ThermiaGenesis(host, port=port, kind=kind)
     try:
-        await thermia.async_update() #Get all register types
-        #await thermia.async_update([REG_INPUT]) #Get only input registers
+        #Get all register types
+        await thermia.async_update()
+
+        #Get only input registers
+        #await thermia.async_update([REG_INPUT])
+
     except (ConnectionError) as error:
         print(f"{error}")
         return
