@@ -16,7 +16,7 @@ setup(
     python_requires=">=3.6",
     install_requires=["pymodbustcp"],
     classifiers=[
-        "License :: MIT License",
+        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Operating System :: OS Independent",
     ],
