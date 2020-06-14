@@ -47,17 +47,17 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         """Write data to heat pump."""
         ret_value = await self._set_data(register, value)
 
-    async def async_update(self):  # pylint:disable=too-many-branches
+    async def async_update(self, register_types=REG_TYPES):  # pylint:disable=too-many-branches
         """Update data from heat pump."""
-        raw_data = await self._get_data()
+        raw_data = await self._get_data(register_types)
 
         if not raw_data:
-            self.data = {}
+            #self.data = {}
             return
 
         #_LOGGER.debug("RAW data: %s", raw_data)
         model = self._kind
-        data = {}
+        #data = {}
         i = 0
         last_address = -1
         try:
@@ -65,9 +65,10 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
                 if(not info[model]): continue
                 address = info[KEY_ADDRESS]
                 regtype = info[KEY_REG_TYPE]
+                if(regtype not in register_types): continue
                 datatype = info[KEY_DATATYPE]
                 scale = info[KEY_SCALE]
-                val = data[name] = raw_data[regtype][address]
+                val = raw_data[regtype][address]
                 if(datatype == TYPE_LONG):
                     regs = raw_data[regtype][address:(address+3)]
                     val = word_list_to_long(regs)[0]
@@ -97,13 +98,13 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
                     val = status_str
 
                 if(scale != 1): val = val / scale
-                data[name] = val
+                self.data[name] = val
 
-            self.firmware = f"{data[ATTR_INPUT_SOFTWARE_VERSION_MAJOR]}.{data[ATTR_INPUT_SOFTWARE_VERSION_MINOR]}.{data[ATTR_INPUT_SOFTWARE_VERSION_MICRO]}"
+            self.firmware = f"{self.data[ATTR_INPUT_SOFTWARE_VERSION_MAJOR]}.{self.data[ATTR_INPUT_SOFTWARE_VERSION_MINOR]}.{self.data[ATTR_INPUT_SOFTWARE_VERSION_MICRO]}"
 
             _LOGGER.debug("------------- REGISTERS ----------------------")
-            for i, (name, val) in enumerate(data.items()):
-                _LOGGER.info(f"{REGISTERS[name][KEY_ADDRESS]}\t{val}\t{name}")
+            for i, (name, val) in enumerate(self.data.items()):
+                _LOGGER.debug(f"{REGISTERS[name][KEY_ADDRESS]}\t{val}\t{name}")
 
 
         except AttributeError as err:
@@ -115,7 +116,7 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         except TypeError as err:
             _LOGGER.debug("Incomplete data from modbus.")
             _LOGGER.debug(err)
-        self.data = data
+        #self.data = data
 
     @property
     def available(self):
@@ -146,11 +147,11 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         return value
 
 
-    async def _get_data(self):
+    async def _get_data(self, register_types):
         """Retreive data from heat pump."""
         raw_data = {}
         try:
-            for regtype in REG_TYPES:
+            for regtype in register_types:
                 last_chunk_address = 0
                 values = []
                 for chunk in REGISTER_RANGES[self._kind][regtype]:
