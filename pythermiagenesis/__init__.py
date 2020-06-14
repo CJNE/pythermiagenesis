@@ -15,9 +15,6 @@ import logging
 from pyModbusTCP.client import ModbusClient
 from pyModbusTCP.utils import *
 
-from pymodbus.constants import Endian
-from pymodbus.payload import BinaryPayloadDecoder
-
 from .const import *
 from struct import unpack
 
@@ -73,8 +70,7 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
                 val = data[name] = raw_data[regtype][address]
                 if(datatype == TYPE_LONG):
                     regs = raw_data[regtype][address:(address+3)]
-                    decoder = BinaryPayloadDecoder.fromRegisters(regs, byteorder=Endian.Big, wordorder=Endian.Big)
-                    val = decoder.decode_32bit_uint()
+                    val = word_list_to_long(regs)[0]
                 elif(datatype == TYPE_INT):
                     if(val == 32767): val = 0
                     if(val > 32767): val = val - 65536
@@ -186,11 +182,3 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
             print(traceback.format_exc())
 
         return raw_data
-
-class ModbusError(Exception):
-    """Raised when Modbus request ended in error."""
-
-    def __init__(self, status):
-        """Initialize."""
-        super(ModbusError, self).__init__(status)
-        self.status = status

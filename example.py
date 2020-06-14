@@ -2,7 +2,7 @@ import asyncio
 import logging
 from sys import argv
 
-from pythermiagenesis import ThermiaGenesis, ModbusError
+from pythermiagenesis import ThermiaGenesis
 
 # heatpum IP address/hostname
 HOST = "10.0.20.8"
@@ -19,8 +19,8 @@ async def main():
     #                mega     - for Mega
     thermia = ThermiaGenesis(host, port=port, kind=kind)
     try:
-        await thermia.async_set()
-    except (ConnectionError, ModbusErrror ) as error:
+        await thermia.async_update()
+    except (ConnectionError) as error:
         print(f"{error}")
         return
 

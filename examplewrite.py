@@ -2,7 +2,7 @@ import asyncio
 import logging
 from sys import argv
 
-from pythermiagenesis import ThermiaGenesis, ModbusError
+from pythermiagenesis import ThermiaGenesis
 from pythermiagenesis.const import ATTR_COIL_ENABLE_TAP_WATER, ATTR_HOLDING_EXTERNAL_ADDITIONAL_HEATER_START
 
 # printer IP address/hostname
@@ -23,7 +23,7 @@ async def main():
         await thermia.async_set(ATTR_COIL_ENABLE_TAP_WATER, False)
         #await thermia.async_set(ATTR_COIL_ENABLE_TAP_WATER, True)
         #await thermia.async_set(ATTR_HOLDING_EXTERNAL_ADDITIONAL_HEATER_START, -5)
-    except (ConnectionError, ModbusErrror ) as error:
+    except (ConnectionError) as error:
         print(f"{error}")
         return
 
