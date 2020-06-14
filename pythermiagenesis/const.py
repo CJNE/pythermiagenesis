@@ -1,4 +1,4 @@
-"""Constants for Brother integration."""
+"""Constants for ThermiaGenesis integration."""
 KEY_ATTRIBUTES = 'attributes'
 KEY_ADDRESS = 'address'
 KEY_RANGES = 'ranges'
