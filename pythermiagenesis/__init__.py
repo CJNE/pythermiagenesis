@@ -29,7 +29,7 @@ def num_to_bin(value):
 class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
     """Main class to perform modbus requests to heat pump."""
 
-    def __init__(self, host, port=502, kind='inverter'):
+    def __init__(self, host, port=502, kind='inverter', delay=0.1):
         """Initialize."""
 
         self.data = {}
@@ -40,6 +40,7 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         self._host = host
         self._port = port
         self._kind = kind
+        self._delay = delay
 
         _LOGGER.debug("Using host: %s:%d", host, port)
 
@@ -131,6 +132,7 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         regtype = meta[KEY_REG_TYPE]
         address = meta[KEY_ADDRESS]
         scale = meta[KEY_SCALE]
+        await asyncio.sleep(self._delay)
         try:
             if(regtype == REG_COIL):
                 _LOGGER.debug(f"Set {regtype} register at {address} value {value} ({value})")
@@ -157,7 +159,7 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
                 last_chunk_address = 0
                 values = []
                 for chunk in REGISTER_RANGES[self._kind][regtype]:
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(self._delay)
                     start_address = chunk[0]
                     length = chunk[1] - start_address
                     #Insert 0 if there is a gap
