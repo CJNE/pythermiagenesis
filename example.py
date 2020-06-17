@@ -3,11 +3,18 @@ import logging
 from sys import argv
 
 from pythermiagenesis import ThermiaGenesis
-from pythermiagenesis.const import REGISTERS, REG_INPUT, KEY_ADDRESS
+from pythermiagenesis.const import (
+        REGISTERS, 
+        REG_INPUT, 
+        KEY_ADDRESS, 
+        ATTR_COIL_ENABLE_HEAT, 
+        ATTR_COIL_ENABLE_BRINE_IN_MONITORING, 
+        )
 
 # heatpum IP address/hostname
 HOST = "10.0.20.8"
 PORT = 502
+#logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO)
 
 
@@ -18,13 +25,14 @@ async def main():
 
     # argument kind: inverter - for Diplomat Inverter
     #                mega     - for Mega
-    thermia = ThermiaGenesis(host, port=port, kind=kind)
+    thermia = ThermiaGenesis(host, port=port, kind=kind, delay=0.15)
     try:
         #Get all register types
         await thermia.async_update()
-
         #Get only input registers
         #await thermia.async_update([REG_INPUT])
+        #Get one specific register
+        #await thermia.async_update(only_registers=[ATTR_COIL_ENABLE_BRINE_IN_MONITORING, ATTR_COIL_ENABLE_HEAT])
 
     except (ConnectionError) as error:
         print(f"{error}")
@@ -35,7 +43,7 @@ async def main():
         print(f"Model: {thermia.model}")
         print(f"Firmware: {thermia.firmware}")
         for i, (name, val) in enumerate(thermia.data.items()):
-            print(f"{REGISTERS[name][KEY_ADDRESS]}\t{val}\t{name}")
+            print(f"{REGISTERS[name][KEY_ADDRESS]}\t{name}\t{val}")
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
