@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="pythermiagenesis",
-    version="0.1.4",
+    version="0.1.5",
     author="Johan Isaksson",
     author_email="johan@generatorhallen.se",
     description="Python wrapper for getting data from Thermia Mega and Inverter heat pumps \

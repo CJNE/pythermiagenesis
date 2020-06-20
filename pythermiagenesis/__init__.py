@@ -64,14 +64,14 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         self._client.close()
 
         if not raw_data:
-            #self.data = {}
-            return
+            self.data = {}
+            return {}
 
         #_LOGGER.debug("RAW data: %s", raw_data)
-        #data = {}
+        data = {}
         try:
             for i, (name, val) in enumerate(raw_data.items()):
-                self.data[name] = val
+                data[name] = val
 
             self.firmware = f"{self.data[ATTR_INPUT_SOFTWARE_VERSION_MAJOR]}.{self.data[ATTR_INPUT_SOFTWARE_VERSION_MINOR]}.{self.data[ATTR_INPUT_SOFTWARE_VERSION_MICRO]}"
 
@@ -89,7 +89,8 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         except TypeError as err:
             _LOGGER.debug("Incomplete data from modbus.")
             _LOGGER.debug(err)
-        #self.data = data
+        self.data = data
+        return data
 
     @property
     def available(self):
@@ -175,7 +176,6 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
                 await asyncio.sleep(self._delay)
                 start_address = chunk['start']
                 length = chunk['end'] - chunk['start'] + 1
-                #Insert 0 if there is a gap
                 regtype = chunk[KEY_REG_TYPE]
                 _LOGGER.debug(f"Reading {regtype} {start_address} length {length}")
                 read_data = None
