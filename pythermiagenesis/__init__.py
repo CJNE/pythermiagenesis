@@ -21,7 +21,18 @@ from struct import unpack
 
 _LOGGER = logging.getLogger(__name__)
 
+class ThermiaException(Exception):
+    def __init__(self, code=None, *args, **kwargs):
+        self.message = ""
+        super().__init__(*args, **kwargs)
+        if code is not None:
+            self.code = code
+            if isinstance(code, str):
+                self.message = self.code
+                return
 
+class ThermiaConnectionError(ThermiaException):
+    pass
 
 def num_to_bin(value):
     if(value > -1): return value
@@ -44,8 +55,6 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         self._delay = delay
         self.MAX_REGISTERS = max_registers
 
-        _LOGGER.debug("Using host: %s:%d", host, port)
-
     async def async_set(self, register, value):  # pylint:disable=too-many-branches
         """Write data to heat pump."""
         ret_value = await self._set_data(register, value)
@@ -53,6 +62,10 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
 
     async def async_update(self, register_types=REG_TYPES, only_registers = None):  # pylint:disable=too-many-branches
         """Update data from heat pump."""
+        if not self._client.is_open():
+            _LOGGER.info("Attempting to open a Modbus TCP connection to %s:%s", self._host, self._port)
+            if not self._client.open():
+                raise ThermiaConnectionError(f"Failed to connect to {self._host}:{self._port}")
         use_registers = []
         if(only_registers != None):
             #Make sure to sort registers by type and address
@@ -103,6 +116,12 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
         regtype = meta[KEY_REG_TYPE]
         address = meta[KEY_ADDRESS]
         scale = meta[KEY_SCALE]
+
+        if not self._client.is_open():
+            _LOGGER.info("Attempting to open a Modbus TCP connection to %s:%s", self._host, self._port)
+            if not self._client.open():
+                raise ThermiaConnectionError(f"Failed to connect to {self._host}:{self._port}")
+
         await asyncio.sleep(self._delay)
         try:
             if(regtype == REG_COIL):
@@ -168,8 +187,7 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
                 else:
                     chunk['end'] = reg_address
         if(chunk != None): chunks.append(chunk)
-        _LOGGER.info(f"Will make {len(chunks)} requests to read {len(registers)} registers")
-        #print(f"Will make {len(chunks)} requests to read {len(registers)} registers")
+        _LOGGER.debug(f"Will make {len(chunks)} requests to read {len(registers)} registers")
 
         try:
             for chunk in chunks:

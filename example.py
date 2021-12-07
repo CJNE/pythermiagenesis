@@ -3,6 +3,7 @@ import logging
 from sys import argv
 
 from pythermiagenesis import ThermiaGenesis
+from pythermiagenesis import ThermiaConnectionError
 from pythermiagenesis.const import (
         REGISTERS, 
         REG_INPUT, 
@@ -14,8 +15,8 @@ from pythermiagenesis.const import (
 # heatpum IP address/hostname
 HOST = "10.0.20.8"
 PORT = 502
-#logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.INFO)
 
 
 async def main():
@@ -28,14 +29,18 @@ async def main():
     thermia = ThermiaGenesis(host, port=port, kind=kind, delay=0.15)
     try:
         #Get all register types
-        await thermia.async_update()
+        #await thermia.async_update()
         #Get only input registers
         #await thermia.async_update([REG_INPUT])
         #Get one specific register
         #await thermia.async_update(only_registers=[ATTR_COIL_ENABLE_BRINE_IN_MONITORING, ATTR_COIL_ENABLE_HEAT])
+        await thermia.async_update([])
 
+    except (ThermiaConnectionError) as error:
+        print(f"Failed to connect: {error.message}")
+        return
     except (ConnectionError) as error:
-        print(f"{error}")
+        print(f"Connection error {error}")
         return
 
     if thermia.available:
