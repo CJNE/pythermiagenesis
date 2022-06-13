@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="pythermiagenesis",
-    version="0.1.6",
+    version="0.1.7",
     author="Johan Isaksson",
     author_email="johan@generatorhallen.se",
     description="Python wrapper for getting data from Thermia Mega and Inverter heat pumps \
@@ -14,7 +14,7 @@ setup(
     license="MIT",
     packages=["pythermiagenesis"],
     python_requires=">=3.6",
-    install_requires=["pymodbustcp"],
+    install_requires=["pymodbustcp==0.1.10"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
