@@ -3,7 +3,7 @@ import logging
 from sys import argv
 
 from pythermiagenesis import ThermiaGenesis
-from pythermiagenesis.const import ATTR_COIL_ENABLE_TAP_WATER, ATTR_HOLDING_EXTERNAL_ADDITIONAL_HEATER_START
+from pythermiagenesis.const import ATTR_COIL_ENABLE_TAP_WATER, ATTR_HOLDING_EXTERNAL_ADDITIONAL_HEATER_START, ATTR_HOLDING_COMFORT_WHEEL_SETTING
 
 # printer IP address/hostname
 HOST = "10.0.20.8"
@@ -20,7 +20,8 @@ async def main():
     #                mega     - for Mega
     thermia = ThermiaGenesis(host, port=port, kind=kind)
     try:
-        await thermia.async_set(ATTR_COIL_ENABLE_TAP_WATER, False)
+        await thermia.async_set(ATTR_HOLDING_COMFORT_WHEEL_SETTING, 21.0)
+        #await thermia.async_set(ATTR_COIL_ENABLE_TAP_WATER, False)
         #await thermia.async_set(ATTR_COIL_ENABLE_TAP_WATER, True)
         #await thermia.async_set(ATTR_HOLDING_EXTERNAL_ADDITIONAL_HEATER_START, -5)
     except (ConnectionError) as error:
