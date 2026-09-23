@@ -109,10 +109,10 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
             for i, (name, val) in enumerate(raw_data.items()):
                 data[name] = val
 
-            self.firmware = f"{self.data[ATTR_INPUT_SOFTWARE_VERSION_MAJOR]}.{self.data[ATTR_INPUT_SOFTWARE_VERSION_MINOR]}.{self.data[ATTR_INPUT_SOFTWARE_VERSION_MICRO]}"
+            self.firmware = f"{data[ATTR_INPUT_SOFTWARE_VERSION_MAJOR]}.{data[ATTR_INPUT_SOFTWARE_VERSION_MINOR]}.{data[ATTR_INPUT_SOFTWARE_VERSION_MICRO]}"
 
             _LOGGER.debug("------------- REGISTERS ----------------------")
-            for i, (name, val) in enumerate(self.data.items()):
+            for i, (name, val) in enumerate(data.items()):
                 _LOGGER.debug(f"{REGISTERS[name][KEY_ADDRESS]}\t{val}\t{name}")
 
         except AttributeError as err:
@@ -230,6 +230,17 @@ class ThermiaGenesis:  # pylint:disable=too-many-instance-attributes
                         REGISTER_RANGES[self._kind][meta[KEY_REG_TYPE]],
                     )
                 )
+                if not in_range:
+                    _LOGGER.warning(
+                        "Register %s (%s address %s) is not inside any declared "
+                        "range for model %s; skipping it",
+                        name,
+                        meta[KEY_REG_TYPE],
+                        start,
+                        self._kind,
+                    )
+                    chunk = None
+                    continue
                 chunk["range_end"] = in_range[0][1]
 
             else:
